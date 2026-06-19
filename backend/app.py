@@ -2,6 +2,12 @@ from fastapi import FastAPI, UploadFile, File
 import os
 from services.pdf_loader import extract_pdf_text
 from graph.nodes.resume_parser import parse_resume
+from pydantic import BaseModel
+
+from graph.nodes.jd_analyzer import analyze_jd
+
+class JDRequest(BaseModel):
+    jd: str
 
 app = FastAPI(
     title="AI Hiring Copilot",
@@ -56,3 +62,11 @@ async def parse_resume_endpoint(file : UploadFile = File(...)) :
     parsed_resume = parse_resume(resume_text)
 
     return parsed_resume
+
+
+@app.post("/analyze-jd")
+def analyze_jd_endpoint(request: JDRequest):
+
+    result = analyze_jd(request.jd)
+
+    return result.model_dump()
