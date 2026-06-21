@@ -6,3 +6,4 @@ class HiringState(TypedDict):
     jd_data : dict
     resumes : list[dict]
     matches: list[dict]
+    evaluations: list[dict]

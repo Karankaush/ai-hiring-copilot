@@ -4,6 +4,7 @@ from graph.state import HiringState
 from graph.nodes.jd_analyzer import analyze_jd
 from graph.nodes.resume_parser import parse_resume
 from graph.nodes.skill_matcher import match_skills
+from graph.nodes.evaluator import (evaluate_candidate)
 
 
 
@@ -64,6 +65,58 @@ def skill_matcher_node(state: HiringState):
 
 
 
+def evaluator_node(state : HiringState):
+    evaluations = []
+
+    for resume, match_result in zip(state["resumes"], state['matches']):
+        evaluation = evaluate_candidate(state["jd_data"], resume, match_result)
+
+        final_score = round((match_result['match_score'] * 0.7) + (evaluation['score'] * 0.3), 2 )
+        if final_score >= 85:
+            recommendation = "Strong Hire"
+
+        elif final_score >= 70:
+            recommendation = "Hire"
+
+        elif final_score >= 50:
+            recommendation = "Consider"
+
+        else:
+            recommendation = "Reject"
+        evaluations.append(
+            {
+                "candidate": resume["name"],
+
+                "match_score":
+                match_result["match_score"],
+
+                "evaluator_score":
+                evaluation["score"],
+
+                "final_score":
+                final_score,
+                "recommendation":
+                recommendation,
+
+                "strengths":
+                evaluation["strengths"],
+
+                "reasoning":
+                evaluation["reasoning"]
+            }
+        )
+
+    return {
+        "evaluations": evaluations
+    }
+
+
+
+
+
+
+
+
 
 
 graph_builder = StateGraph(HiringState)
@@ -71,12 +124,14 @@ graph_builder = StateGraph(HiringState)
 graph_builder.add_node("jd_analyzer", jd_node)
 graph_builder.add_node("resume_parser", resume_node)
 graph_builder.add_node("skill_matcher", skill_matcher_node)
+graph_builder.add_node("evaluator",evaluator_node)
 
 
 graph_builder.add_edge(START, "jd_analyzer")
 graph_builder.add_edge("jd_analyzer", "resume_parser")
 graph_builder.add_edge("resume_parser", "skill_matcher")
-graph_builder.add_edge("skill_matcher", END)
+graph_builder.add_edge("skill_matcher","evaluator")
+graph_builder.add_edge("evaluator",END)
 
 workflow = graph_builder.compile()
 
