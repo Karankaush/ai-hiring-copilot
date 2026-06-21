@@ -5,3 +5,5 @@ pymupdfpython-multipart
 langchain
 langchain-groq
 python-dotenv
+
+langgraph

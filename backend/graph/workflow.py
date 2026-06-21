@@ -20,7 +20,7 @@ def resume_node(state : HiringState):
 
         result = parse_resume(resume_text)
 
-        parsed_resumes.append(result.model_dump)
+        parsed_resumes.append(result.model_dump())
 
     return {
         "resumes" : parsed_resumes
@@ -38,3 +38,4 @@ graph_builder.add_edge("jd_analyzer", "resume_parser")
 graph_builder.add_edge("resume_parser", END)
 
 workflow = graph_builder.compile()
+
