@@ -5,3 +5,4 @@ class HiringState(TypedDict):
     resume_texts : list[str]
     jd_data : dict
     resumes : list[dict]
+    matches: list[dict]

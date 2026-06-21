@@ -11,6 +11,7 @@ def parse_resume(resume_text : str):
     prompt = ChatPromptTemplate.from_template(
         """
         You are an expert resume parser.
+        
 
         Extract:
 
