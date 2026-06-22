@@ -9,3 +9,4 @@ class HiringState(TypedDict):
     evaluations: list[dict]
     critiques: list[dict]
     judgments: list[dict]
+    rankings: list[dict]

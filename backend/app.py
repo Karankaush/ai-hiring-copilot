@@ -210,5 +210,8 @@ async def analyze_candidates(
     "jd_data": result["jd_data"],
     "resumes": result["resumes"],
     "matches": result["matches"],
-    "evaluations": result["evaluations"]
+    "evaluations": result["evaluations"],
+    "critiques": result["critiques"],
+    "judgments": result["judgments"],
+    "rankings": result["rankings"]
     }

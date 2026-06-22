@@ -7,6 +7,7 @@ from graph.nodes.skill_matcher import match_skills
 from graph.nodes.evaluator import (evaluate_candidate)
 from graph.nodes.critic import critique_candidate
 from graph.nodes.judge import judge_candidate
+from graph.nodes.ranking import rank_candidates
 
 
 
@@ -165,7 +166,15 @@ def judge_node(state: HiringState):
         "judgments": judgments
     }
 
+def ranking_node(state: HiringState):
 
+    rankings = rank_candidates(
+        state["judgments"]
+    )
+
+    return {
+        "rankings": rankings
+    }
 
 
 
@@ -177,6 +186,15 @@ graph_builder.add_node("skill_matcher", skill_matcher_node)
 graph_builder.add_node("evaluator",evaluator_node)
 graph_builder.add_node("critic",critic_node)
 graph_builder.add_node("judge",judge_node)
+graph_builder.add_node("ranking",ranking_node)
+
+
+
+
+
+
+
+
 
 graph_builder.add_edge(START, "jd_analyzer")
 graph_builder.add_edge("jd_analyzer", "resume_parser")
@@ -184,7 +202,8 @@ graph_builder.add_edge("resume_parser", "skill_matcher")
 graph_builder.add_edge("skill_matcher","evaluator")
 graph_builder.add_edge("evaluator","critic")
 graph_builder.add_edge("critic","judge")
-graph_builder.add_edge("judge",END)
+graph_builder.add_edge("judge","ranking")
+graph_builder.add_edge("ranking",END)
 
 
 workflow = graph_builder.compile()
