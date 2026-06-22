@@ -1,8 +1,19 @@
 "use client";
 import { analyzeCandidates } from "@/services/api";
 import { useState } from "react";
+import { useHiringStore } from "@/store/useHiringStore";
+
+import { useRouter } from "next/navigation";
+
 
 export default function Home() {
+
+  const router = useRouter();
+
+  const setResults =
+    useHiringStore(
+      (state) => state.setResults
+    );
 
   const [jd, setJd] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,12 +26,15 @@ export default function Home() {
 
     setLoading(true);
 
-    const result = await analyzeCandidates(
+    const result =
+    await analyzeCandidates(
       jd,
       files
     );
 
-    console.log(result);
+  setResults(result);
+
+  router.push("/results");
 
   } catch (error) {
 
