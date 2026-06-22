@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File, Form
 import os
 from services.pdf_loader import extract_pdf_text
@@ -8,6 +9,7 @@ from graph.workflow import workflow
 
 from graph.nodes.jd_analyzer import analyze_jd
 
+
 class JDRequest(BaseModel):
     jd: str
 
@@ -16,6 +18,22 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
+
+
+
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 
