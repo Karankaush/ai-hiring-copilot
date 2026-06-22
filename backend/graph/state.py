@@ -8,3 +8,4 @@ class HiringState(TypedDict):
     matches: list[dict]
     evaluations: list[dict]
     critiques: list[dict]
+    judgments: list[dict]

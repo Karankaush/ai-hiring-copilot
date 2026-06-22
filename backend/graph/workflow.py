@@ -6,7 +6,7 @@ from graph.nodes.resume_parser import parse_resume
 from graph.nodes.skill_matcher import match_skills
 from graph.nodes.evaluator import (evaluate_candidate)
 from graph.nodes.critic import critique_candidate
-
+from graph.nodes.judge import judge_candidate
 
 
 
@@ -137,7 +137,33 @@ def critic_node(state: HiringState):
         "critiques": critiques
     }
 
+def judge_node(state: HiringState):
 
+    judgments = []
+
+    for resume, evaluation, critique in zip(
+        state["resumes"],
+        state["evaluations"],
+        state["critiques"]
+    ):
+
+        judgment = judge_candidate(
+            state["jd_data"],
+            resume,
+            evaluation,
+            critique
+        )
+
+        judgments.append(
+            {
+                "candidate": resume["name"],
+                **judgment
+            }
+        )
+
+    return {
+        "judgments": judgments
+    }
 
 
 
@@ -150,14 +176,15 @@ graph_builder.add_node("resume_parser", resume_node)
 graph_builder.add_node("skill_matcher", skill_matcher_node)
 graph_builder.add_node("evaluator",evaluator_node)
 graph_builder.add_node("critic",critic_node)
-
+graph_builder.add_node("judge",judge_node)
 
 graph_builder.add_edge(START, "jd_analyzer")
 graph_builder.add_edge("jd_analyzer", "resume_parser")
 graph_builder.add_edge("resume_parser", "skill_matcher")
 graph_builder.add_edge("skill_matcher","evaluator")
 graph_builder.add_edge("evaluator","critic")
-graph_builder.add_edge("critic",END)
+graph_builder.add_edge("critic","judge")
+graph_builder.add_edge("judge",END)
 
 
 workflow = graph_builder.compile()
