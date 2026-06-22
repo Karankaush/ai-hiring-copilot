@@ -37,44 +37,44 @@ app.add_middleware(
 
 
 
-from fastapi.openapi.utils import get_openapi
+# from fastapi.openapi.utils import get_openapi
 
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
+# def custom_openapi():
+#     if app.openapi_schema:
+#         return app.openapi_schema
 
-    openapi_schema = get_openapi(
-        title=app.title,
-        version=app.version,
-        routes=app.routes,
-    )
+#     openapi_schema = get_openapi(
+#         title=app.title,
+#         version=app.version,
+#         routes=app.routes,
+#     )
 
-    # Purane Swagger UI ke liye format:binary wapas add karo
-    for path_item in openapi_schema.get("paths", {}).values():
-        for operation in path_item.values():
-            request_body = operation.get("requestBody")
-            if not request_body:
-                continue
-            multipart = request_body.get("content", {}).get("multipart/form-data")
-            if not multipart:
-                continue
-            schema_ref = multipart.get("schema", {}).get("$ref")
-            if not schema_ref:
-                continue
-            schema_name = schema_ref.split("/")[-1]
-            schema_def = openapi_schema["components"]["schemas"].get(schema_name, {})
-            for prop in schema_def.get("properties", {}).values():
-                if prop.get("contentMediaType") == "application/octet-stream":
-                    prop["format"] = "binary"
-                if prop.get("type") == "array":
-                    items = prop.get("items", {})
-                    if items.get("contentMediaType") == "application/octet-stream":
-                        items["format"] = "binary"
+#     # Purane Swagger UI ke liye format:binary wapas add karo
+#     for path_item in openapi_schema.get("paths", {}).values():
+#         for operation in path_item.values():
+#             request_body = operation.get("requestBody")
+#             if not request_body:
+#                 continue
+#             multipart = request_body.get("content", {}).get("multipart/form-data")
+#             if not multipart:
+#                 continue
+#             schema_ref = multipart.get("schema", {}).get("$ref")
+#             if not schema_ref:
+#                 continue
+#             schema_name = schema_ref.split("/")[-1]
+#             schema_def = openapi_schema["components"]["schemas"].get(schema_name, {})
+#             for prop in schema_def.get("properties", {}).values():
+#                 if prop.get("contentMediaType") == "application/octet-stream":
+#                     prop["format"] = "binary"
+#                 if prop.get("type") == "array":
+#                     items = prop.get("items", {})
+#                     if items.get("contentMediaType") == "application/octet-stream":
+#                         items["format"] = "binary"
 
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
+#     app.openapi_schema = openapi_schema
+#     return app.openapi_schema
 
-app.openapi = custom_openapi
+# app.openapi = custom_openapi
 
 
 
