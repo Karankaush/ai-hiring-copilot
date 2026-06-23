@@ -1,3 +1,14 @@
+import { Badge } from "@/components/ui/badge";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 interface RankingTableProps {
   rankings: any[];
   results: any;
@@ -9,94 +20,161 @@ export default function RankingTable({
   results,
   setSelectedCandidate,
 }: RankingTableProps) {
+  const getBadgeVariant = (
+    recommendation: string
+  ) => {
+
+    switch (
+      recommendation
+        ?.toLowerCase()
+    ) {
+      case "strong hire":
+        return "default";
+
+      case "hire":
+        return "secondary";
+
+      case "consider":
+        return "outline";
+
+      case "reject":
+        return "destructive";
+
+      default:
+        return "outline";
+    }
+  };
+
   return (
-    <table className="w-full border">
-      <thead>
-        <tr>
-          <th className="border p-3">
-            Rank
-          </th>
+    <div className="rounded-xl border bg-white shadow-sm p-4">
 
-          <th className="border p-3">
-            Candidate
-          </th>
+      <Table>
 
-          <th className="border p-3">
-            Score
-          </th>
+        <TableHeader>
 
-          <th className="border p-3">
-            Recommendation
-          </th>
-        </tr>
-      </thead>
+          <TableRow>
 
-      <tbody>
-        {rankings.map(
-          (candidate: any) => (
-            <tr
-              key={candidate.rank}
-              onClick={() => {
+            <TableHead>
+              Rank
+            </TableHead>
 
-                const judgment =
-                  results.judgments.find(
-                    (j: any) =>
-                      j.candidate ===
-                      candidate.candidate
-                  );
+            <TableHead>
+              Candidate
+            </TableHead>
 
-                const evaluation =
-                  results.evaluations.find(
-                    (e: any) =>
-                      e.candidate ===
-                      candidate.candidate
-                  );
+            <TableHead>
+              Score
+            </TableHead>
 
-                const critique =
-                  results.critiques.find(
-                    (c: any) =>
-                      c.candidate ===
-                      candidate.candidate
-                  );
+            <TableHead>
+              Recommendation
+            </TableHead>
 
-                const resume =
-                  results.resumes.find(
-                    (r: any) =>
-                      r.name ===
-                      candidate.candidate
-                  );
+          </TableRow>
 
-                setSelectedCandidate({
-                  ...candidate,
-                  judgment,
-                  evaluation,
-                  critique,
-                  resume,
-                });
-              }}
-              className="cursor-pointer hover:bg-gray-100"
-            >
-              <td className="border p-3">
-                {candidate.rank}
-              </td>
+        </TableHeader>
 
-              <td className="border p-3">
-                {candidate.candidate}
-              </td>
+        <TableBody>
 
-              <td className="border p-3">
-                {candidate.score}
-              </td>
+          {rankings.map(
+            (
+              candidate: any
+            ) => (
 
-              <td className="border p-3">
-                {
-                  candidate.recommendation
+              <TableRow
+                key={
+                  candidate.rank
                 }
-              </td>
-            </tr>
-          )
-        )}
-      </tbody>
-    </table>
+                className="cursor-pointer"
+                onClick={() => {
+
+                  const judgment =
+                    results.judgments.find(
+                      (
+                        j: any
+                      ) =>
+                        j.candidate ===
+                        candidate.candidate
+                    );
+
+                  const evaluation =
+                    results.evaluations.find(
+                      (
+                        e: any
+                      ) =>
+                        e.candidate ===
+                        candidate.candidate
+                    );
+
+                  const critique =
+                    results.critiques.find(
+                      (
+                        c: any
+                      ) =>
+                        c.candidate ===
+                        candidate.candidate
+                    );
+
+                  const resume =
+                    results.resumes.find(
+                      (
+                        r: any
+                      ) =>
+                        r.name ===
+                        candidate.candidate
+                    );
+
+                  setSelectedCandidate(
+                    {
+                      ...candidate,
+                      judgment,
+                      evaluation,
+                      critique,
+                      resume,
+                    }
+                  );
+                }}
+              >
+
+                <TableCell>
+                  #{candidate.rank}
+                </TableCell>
+
+                <TableCell className="font-medium">
+                  {
+                    candidate.candidate
+                  }
+                </TableCell>
+
+                <TableCell>
+                  {
+                    candidate.score
+                  }
+                </TableCell>
+
+                <TableCell>
+
+                  <Badge
+                    variant={getBadgeVariant(
+                      candidate.recommendation
+                    )}
+                  >
+                    {
+                      candidate.recommendation
+                    }
+                  </Badge>
+
+                </TableCell>
+
+              </TableRow>
+
+            )
+          )}
+
+        </TableBody>
+
+      </Table>
+
+    </div>
   );
 }

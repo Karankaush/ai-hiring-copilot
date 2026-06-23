@@ -1,3 +1,5 @@
+import { Card, CardContent } from "@/components/ui/card";
+
 interface SummaryCardsProps {
   totalCandidates: number;
   topCandidate: any;
@@ -10,47 +12,55 @@ export default function SummaryCards({
   rejectedCount,
 }: SummaryCardsProps) {
   return (
-    <div className="grid md:grid-cols-4 gap-4 mb-8">
+    <div className="grid gap-6 md:grid-cols-4 mb-10">
 
-      <div className="border rounded-xl p-4 bg-white shadow-sm">
-        <p className="text-sm text-gray-500">
-          Total Candidates
-        </p>
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">
+            Total Candidates
+          </p>
 
-        <p className="text-3xl font-bold">
-          {totalCandidates}
-        </p>
-      </div>
+          <h2 className="text-4xl font-bold mt-2">
+            {totalCandidates}
+          </h2>
+        </CardContent>
+      </Card>
 
-      <div className="border rounded-xl p-4 bg-white shadow-sm">
-        <p className="text-sm text-gray-500">
-          Top Candidate
-        </p>
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">
+            Top Candidate
+          </p>
 
-        <p className="font-semibold">
-          {topCandidate?.candidate}
-        </p>
-      </div>
+          <h2 className="text-lg font-semibold mt-2">
+            {topCandidate?.candidate || "-"}
+          </h2>
+        </CardContent>
+      </Card>
 
-      <div className="border rounded-xl p-4 bg-white shadow-sm">
-        <p className="text-sm text-gray-500">
-          Highest Score
-        </p>
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">
+            Highest Score
+          </p>
 
-        <p className="text-3xl font-bold">
-          {topCandidate?.score}
-        </p>
-      </div>
+          <h2 className="text-4xl font-bold mt-2">
+            {topCandidate?.score || 0}
+          </h2>
+        </CardContent>
+      </Card>
 
-      <div className="border rounded-xl p-4 bg-white shadow-sm">
-        <p className="text-sm text-gray-500">
-          Rejected
-        </p>
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">
+            Rejected
+          </p>
 
-        <p className="text-3xl font-bold">
-          {rejectedCount}
-        </p>
-      </div>
+          <h2 className="text-4xl font-bold mt-2">
+            {rejectedCount}
+          </h2>
+        </CardContent>
+      </Card>
 
     </div>
   );

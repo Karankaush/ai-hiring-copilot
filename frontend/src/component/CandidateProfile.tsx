@@ -1,3 +1,12 @@
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Separator } from "@/components/ui/separator";
+
 interface CandidateProfileProps {
   candidate: any;
 }
@@ -6,62 +15,78 @@ export default function CandidateProfile({
   candidate,
 }: CandidateProfileProps) {
   return (
-    <div className="border rounded p-5 mt-6">
+    <Card className="mt-6">
 
-      <h3 className="text-xl font-bold mb-4">
-        Candidate Profile
-      </h3>
+      <CardHeader>
 
-      <div className="mb-6">
+        <CardTitle>
+          Candidate Profile
+        </CardTitle>
 
-        <h4 className="font-semibold mb-2">
-          Skills
-        </h4>
+      </CardHeader>
 
-        <ul className="list-disc ml-6">
+      <CardContent>
 
-          {
-            candidate.resume?.skills?.map(
+        <div>
+
+          <h4 className="font-semibold text-lg mb-3">
+            Skills
+          </h4>
+
+          <div className="flex flex-wrap gap-2">
+
+            {candidate.resume?.skills?.map(
               (
                 skill: string,
                 index: number
               ) => (
-                <li key={index}>
+
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full border text-sm"
+                >
                   {skill}
-                </li>
+                </span>
+
               )
-            )
-          }
+            )}
 
-        </ul>
+          </div>
 
-      </div>
+        </div>
 
-      <div>
+        <Separator className="my-6" />
 
-        <h4 className="font-semibold mb-2">
-          Projects
-        </h4>
+        <div>
 
-        <ul className="list-disc ml-6">
+          <h4 className="font-semibold text-lg mb-3">
+            Projects
+          </h4>
 
-          {
-            candidate.resume?.projects?.map(
+          <ul className="space-y-2">
+
+            {candidate.resume?.projects?.map(
               (
                 project: string,
                 index: number
               ) => (
-                <li key={index}>
+
+                <li
+                  key={index}
+                  className="border rounded-lg p-3"
+                >
                   {project}
                 </li>
+
               )
-            )
-          }
+            )}
 
-        </ul>
+          </ul>
 
-      </div>
+        </div>
 
-    </div>
+      </CardContent>
+
+    </Card>
   );
 }

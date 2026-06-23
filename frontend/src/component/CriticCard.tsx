@@ -1,3 +1,10 @@
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 interface CriticCardProps {
   candidate: any;
 }
@@ -6,31 +13,40 @@ export default function CriticCard({
   candidate,
 }: CriticCardProps) {
   return (
-    <div className="border p-5 rounded">
+    <Card className="border-red-200">
 
-      <h3 className="text-xl font-bold mb-4">
-        Critic Agent
-      </h3>
+      <CardHeader>
 
-      <ul className="list-disc ml-6">
+        <CardTitle className="text-red-700">
+          ❌ Critic Agent
+        </CardTitle>
 
-        {
-          candidate.critique
-            ?.concerns
-            ?.map(
-              (
-                item: string,
-                index: number
-              ) => (
-                <li key={index}>
-                  {item}
-                </li>
-              )
+      </CardHeader>
+
+      <CardContent>
+
+        <ul className="space-y-3">
+
+          {candidate.critique?.concerns?.map(
+            (
+              item: string,
+              index: number
+            ) => (
+
+              <li
+                key={index}
+                className="border rounded-lg p-3 bg-red-50"
+              >
+                {item}
+              </li>
+
             )
-        }
+          )}
 
-      </ul>
+        </ul>
 
-    </div>
+      </CardContent>
+
+    </Card>
   );
 }

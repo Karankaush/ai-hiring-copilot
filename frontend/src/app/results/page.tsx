@@ -36,86 +36,142 @@ export default function ResultsPage() {
     ).length;
 
   return (
-    <main className="max-w-7xl mx-auto p-8 min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-100">
 
-      <SummaryCards
-        totalCandidates={totalCandidates}
-        topCandidate={topCandidate}
-        rejectedCount={rejectedCount}
-      />
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-      <h1 className="text-4xl font-bold mb-8">
-        Candidate Rankings
-      </h1>
+        {/* Header */}
 
-      <RankingTable
-        rankings={rankings}
-        results={results}
-        setSelectedCandidate={
-          setSelectedCandidate
-        }
-      />
+        <div className="mb-10">
 
-      {selectedCandidate && (
+          <h1 className="text-5xl font-bold tracking-tight">
+            Hiring Results
+          </h1>
+
+          <p className="text-muted-foreground mt-2">
+            AI-powered candidate evaluation dashboard
+          </p>
+
+        </div>
+
+        {/* Summary */}
+
+        <SummaryCards
+          totalCandidates={totalCandidates}
+          topCandidate={topCandidate}
+          rejectedCount={rejectedCount}
+        />
+
+        {/* Rankings */}
 
         <div className="mt-10">
 
-          <div className="border rounded-xl bg-white shadow-sm p-6">
+          <h2 className="text-2xl font-semibold mb-4">
+            Candidate Rankings
+          </h2>
 
-            <h2 className="text-3xl font-bold mb-4">
-              {selectedCandidate.candidate}
-            </h2>
-
-            <div className="flex gap-8">
-
-              <p>
-                <strong>Score:</strong>{" "}
-                {selectedCandidate.score}
-              </p>
-
-              <p>
-                <strong>
-                  Recommendation:
-                </strong>{" "}
-                {
-                  selectedCandidate
-                    .recommendation
-                }
-              </p>
-
-            </div>
-
-          </div>
-
-          <CandidateProfile
-            candidate={selectedCandidate}
-          />
-
-          <div className="grid md:grid-cols-2 gap-6 mt-8">
-
-            <EvaluatorCard
-              candidate={
-                selectedCandidate
-              }
-            />
-
-            <CriticCard
-              candidate={
-                selectedCandidate
-              }
-            />
-
-          </div>
-
-          <JudgeCard
-            candidate={
-              selectedCandidate
+          <RankingTable
+            rankings={rankings}
+            results={results}
+            setSelectedCandidate={
+              setSelectedCandidate
             }
           />
 
         </div>
 
-      )}
+        {/* Candidate Details */}
+
+        {selectedCandidate && (
+
+          <div className="mt-12 space-y-6">
+
+            <div className="bg-white border rounded-xl shadow-sm p-6">
+
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                <div>
+
+                  <h2 className="text-3xl font-bold">
+                    {
+                      selectedCandidate.candidate
+                    }
+                  </h2>
+
+                  <p className="text-muted-foreground mt-1">
+                    Selected Candidate Overview
+                  </p>
+
+                </div>
+
+                <div className="flex gap-8">
+
+                  <div>
+
+                    <p className="text-sm text-muted-foreground">
+                      Score
+                    </p>
+
+                    <p className="text-2xl font-bold">
+                      {
+                        selectedCandidate.score
+                      }
+                    </p>
+
+                  </div>
+
+                  <div>
+
+                    <p className="text-sm text-muted-foreground">
+                      Recommendation
+                    </p>
+
+                    <p className="text-lg font-semibold">
+                      {
+                        selectedCandidate
+                          .recommendation
+                      }
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <CandidateProfile
+              candidate={selectedCandidate}
+            />
+
+            <div className="grid lg:grid-cols-2 gap-6">
+
+              <EvaluatorCard
+                candidate={
+                  selectedCandidate
+                }
+              />
+
+              <CriticCard
+                candidate={
+                  selectedCandidate
+                }
+              />
+
+            </div>
+
+            <JudgeCard
+              candidate={
+                selectedCandidate
+              }
+            />
+
+          </div>
+
+        )}
+
+      </div>
 
     </main>
   );

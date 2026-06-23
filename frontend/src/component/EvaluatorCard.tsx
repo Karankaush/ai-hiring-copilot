@@ -1,3 +1,10 @@
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 interface EvaluatorCardProps {
   candidate: any;
 }
@@ -6,31 +13,40 @@ export default function EvaluatorCard({
   candidate,
 }: EvaluatorCardProps) {
   return (
-    <div className="border p-5 rounded">
+    <Card className="border-green-200">
 
-      <h3 className="text-xl font-bold mb-4">
-        Evaluator Agent
-      </h3>
+      <CardHeader>
 
-      <ul className="list-disc ml-6">
+        <CardTitle className="text-green-700">
+          ✅ Evaluator Agent
+        </CardTitle>
 
-        {
-          candidate.evaluation
-            ?.strengths
-            ?.map(
-              (
-                item: string,
-                index: number
-              ) => (
-                <li key={index}>
-                  {item}
-                </li>
-              )
+      </CardHeader>
+
+      <CardContent>
+
+        <ul className="space-y-3">
+
+          {candidate.evaluation?.strengths?.map(
+            (
+              item: string,
+              index: number
+            ) => (
+
+              <li
+                key={index}
+                className="border rounded-lg p-3 bg-green-50"
+              >
+                {item}
+              </li>
+
             )
-        }
+          )}
 
-      </ul>
+        </ul>
 
-    </div>
+      </CardContent>
+
+    </Card>
   );
 }
