@@ -1,11 +1,14 @@
 fastapi
 uvicorn
-pymupdfpython-multipart
+
+python-multipart
+pymupdf
 
 langchain
 langchain-groq
+langgraph
+
 python-dotenv
 
-langgraph
 sentence-transformers
 scikit-learn
