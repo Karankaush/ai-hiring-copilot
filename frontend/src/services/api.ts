@@ -21,7 +21,14 @@ export async function analyzeCandidates(
   );
 
   if (!response.ok) {
-    throw new Error("Analysis Failed");
+
+    const errorData =
+      await response.json();
+
+    throw new Error(
+      errorData.detail ||
+      "Analysis Failed"
+    );
   }
 
   return response.json();

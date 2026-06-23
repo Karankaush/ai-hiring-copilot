@@ -6,7 +6,7 @@ from graph.nodes.resume_parser import parse_resume
 from pydantic import BaseModel
 from typing import List
 from graph.workflow import workflow
-
+from fastapi import HTTPException
 from graph.nodes.jd_analyzer import analyze_jd
 
 
@@ -34,65 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-
-# from fastapi.openapi.utils import get_openapi
-
-# def custom_openapi():
-#     if app.openapi_schema:
-#         return app.openapi_schema
-
-#     openapi_schema = get_openapi(
-#         title=app.title,
-#         version=app.version,
-#         routes=app.routes,
-#     )
-
-#     # Purane Swagger UI ke liye format:binary wapas add karo
-#     for path_item in openapi_schema.get("paths", {}).values():
-#         for operation in path_item.values():
-#             request_body = operation.get("requestBody")
-#             if not request_body:
-#                 continue
-#             multipart = request_body.get("content", {}).get("multipart/form-data")
-#             if not multipart:
-#                 continue
-#             schema_ref = multipart.get("schema", {}).get("$ref")
-#             if not schema_ref:
-#                 continue
-#             schema_name = schema_ref.split("/")[-1]
-#             schema_def = openapi_schema["components"]["schemas"].get(schema_name, {})
-#             for prop in schema_def.get("properties", {}).values():
-#                 if prop.get("contentMediaType") == "application/octet-stream":
-#                     prop["format"] = "binary"
-#                 if prop.get("type") == "array":
-#                     items = prop.get("items", {})
-#                     if items.get("contentMediaType") == "application/octet-stream":
-#                         items["format"] = "binary"
-
-#     app.openapi_schema = openapi_schema
-#     return app.openapi_schema
-
-# app.openapi = custom_openapi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -200,36 +141,122 @@ async def analyze_candidates(
     files: List[UploadFile] = File(...)
 ):
 
-    os.makedirs("uploads", exist_ok=True)
+    try:
 
-    resume_texts = []
+        # Validate JD
 
-    for file in files:
+        if not jd.strip():
 
-        file_path = f"uploads/{file.filename}"
+            raise HTTPException(
+                status_code=400,
+                detail="Job Description cannot be empty"
+            )
 
-        with open(file_path, "wb") as buffer:
-            buffer.write(await file.read())
+        # Validate Files
 
-        resume_text = extract_pdf_text(file_path)
+        if len(files) == 0:
 
-        resume_texts.append(resume_text)
+            raise HTTPException(
+                status_code=400,
+                detail="Please upload at least one resume"
+            )
 
-        os.remove(file_path)
+        os.makedirs(
+            "uploads",
+            exist_ok=True
+        )
 
-    result = workflow.invoke(
-        {
-            "jd_text": jd,
-            "resume_texts": resume_texts
+        resume_texts = []
+
+        for file in files:
+
+            # Validate PDF
+
+            if not file.filename.endswith(".pdf"):
+
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{file.filename} is not a PDF file"
+                )
+
+            file_path = (
+                f"uploads/{file.filename}"
+            )
+
+            with open(
+                file_path,
+                "wb"
+            ) as buffer:
+
+                buffer.write(
+                    await file.read()
+                )
+
+            resume_text = (
+                extract_pdf_text(
+                    file_path
+                )
+            )
+
+            resume_texts.append(
+                resume_text
+            )
+
+            if os.path.exists(
+                file_path
+            ):
+                os.remove(
+                    file_path
+                )
+
+        result = workflow.invoke(
+            {
+                "jd_text": jd,
+                "resume_texts": resume_texts
+            }
+        )
+
+        return {
+            "jd_data":
+                result["jd_data"],
+
+            "resumes":
+                result["resumes"],
+
+            "matches":
+                result["matches"],
+
+            "evaluations":
+                result["evaluations"],
+
+            "critiques":
+                result["critiques"],
+
+            "judgments":
+                result["judgments"],
+
+            "rankings":
+                result["rankings"]
         }
+
+    except HTTPException:
+        raise
+
+    except ValueError as e:
+
+        raise HTTPException(
+        status_code=400,
+        detail=str(e)
     )
 
-    return {
-    "jd_data": result["jd_data"],
-    "resumes": result["resumes"],
-    "matches": result["matches"],
-    "evaluations": result["evaluations"],
-    "critiques": result["critiques"],
-    "judgments": result["judgments"],
-    "rankings": result["rankings"]
-    }
+    except Exception as e:
+
+        print(
+            "ANALYZE ERROR:",
+            str(e)
+        )
+
+    raise HTTPException(
+        status_code=500,
+        detail=f"Internal Error: {str(e)}"
+    )

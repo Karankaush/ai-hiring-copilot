@@ -8,32 +8,60 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
 
+  const [error, setError] = useState("");
+
   const setResults = useHiringStore(
     (state) => state.setResults
   );
 
   const [jd, setJd] = useState("");
-  const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
+
+const loadingSteps = [
+  "Parsing resumes...",
+  "Analyzing job description...",
+  "Matching skills...",
+  "Evaluating candidates...",
+  "Ranking candidates...",
+];
 
   const handleAnalyze = async () => {
-    try {
-      setLoading(true);
 
-      const result = await analyzeCandidates(
+  try {
+
+    setError("");
+
+    setLoading(true);
+
+    const result =
+      await analyzeCandidates(
         jd,
         files
       );
 
-      setResults(result);
+    setResults(result);
 
-      router.push("/results");
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    router.push(
+      "/results"
+    );
+
+  } catch (error: any) {
+
+    console.error(error);
+
+    setError(
+      error.message ||
+      "Something went wrong"
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -79,6 +107,15 @@ export default function Home() {
             />
 
           </div>
+        {
+          error && (
+
+            <p className="text-red-500 text-sm mt-2">
+              {error}
+            </p>
+
+          )
+        }
 
           {/* Resume Upload */}
 
@@ -143,22 +180,53 @@ export default function Home() {
           )}
 
           {/* Analyze Button */}
+{loading ? (
 
-          <button
-            onClick={handleAnalyze}
-            disabled={
-              loading ||
-              !jd.trim() ||
-              files.length === 0
-            }
-            className="w-full py-4 rounded-xl font-semibold text-white bg-black hover:opacity-90 disabled:opacity-50"
+  <div className="border rounded-xl p-6 bg-white">
+
+    <h3 className="text-lg font-semibold mb-4">
+      Analyzing Candidates
+    </h3>
+
+    <div className="space-y-3">
+
+      {loadingSteps.map(
+        (step, index) => (
+
+          <div
+            key={index}
+            className="flex items-center gap-3"
           >
 
-            {loading
-              ? "Analyzing Candidates..."
-              : "Analyze Candidates"}
+            <div className="h-2 w-2 rounded-full bg-black animate-pulse" />
 
-          </button>
+            <span>
+              {step}
+            </span>
+
+          </div>
+
+        )
+      )}
+
+    </div>
+
+  </div>
+
+) : (
+
+  <button
+    onClick={handleAnalyze}
+    disabled={
+      !jd.trim() ||
+      files.length === 0
+    }
+    className="w-full py-4 rounded-xl font-semibold text-white bg-black hover:opacity-90 disabled:opacity-50"
+  >
+    Analyze Candidates
+  </button>
+
+)}
 
         </div>
 

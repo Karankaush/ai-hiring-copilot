@@ -8,21 +8,44 @@ def calculate_similarity(
     skill_b: str
 ):
 
-    emb_a = get_embedding(skill_a)
-    emb_b = get_embedding(skill_b)
+    try:
 
-    score = cosine_similarity(
-        [emb_a],
-        [emb_b]
-    )[0][0]
+        emb_a = get_embedding(skill_a)
+        emb_b = get_embedding(skill_b)
 
-    return float(score)
+        score = cosine_similarity(
+            [emb_a],
+            [emb_b]
+        )[0][0]
+
+        return float(score)
+
+    except Exception as e:
+
+        print(
+            f"Similarity Error: {str(e)}"
+        )
+
+        return 0.0
 
 
 def match_skills(
     jd_skills: list[str],
     resume_skills: list[str]
 ):
+
+    # Prevent crash if JD contains no skills
+
+    if not jd_skills:
+
+        return {
+            "match_score": 0,
+            "matched_skills": [],
+            "missing_skills": [],
+            "error": (
+                "No skills found in Job Description"
+            )
+        }
 
     matched_skills = []
     missing_skills = []
@@ -36,21 +59,32 @@ def match_skills(
         for resume_skill in resume_skills:
 
             # Exact Match
-            if (jd_skill.lower().strip() == resume_skill.lower().strip()):
+
+            if (
+                jd_skill.lower().strip()
+                ==
+                resume_skill.lower().strip()
+            ):
 
                 best_score = 1.0
                 break
 
-            # Semantic Match
-            score = calculate_similarity(
-                jd_skill,
-                resume_skill
-            )
+            try:
 
-            if score > best_score:
-                best_score = score
+                score = calculate_similarity(
+                    jd_skill,
+                    resume_skill
+                )
 
-        
+                if score > best_score:
+                    best_score = score
+
+            except Exception as e:
+
+                print(
+                    f"Matching Error: {str(e)}"
+                )
+
         if best_score >= 0.70:
 
             matched_skills.append(

@@ -8,6 +8,14 @@ from schemas.jd_schema import JobDescription
 
 def analyze_jd(jd_text: str):
 
+    # Validate empty JD
+
+    if not jd_text.strip():
+
+        raise ValueError(
+            "Job Description cannot be empty"
+        )
+
     llm = get_llm()
 
     prompt = ChatPromptTemplate.from_template(
@@ -40,79 +48,56 @@ def analyze_jd(jd_text: str):
 
     chain = prompt | llm
 
-    response = chain.invoke(
-        {
-            "jd_text": jd_text
-        }
-    )
+    try:
 
-    content = response.content.strip()
+        response = chain.invoke(
+            {
+                "jd_text": jd_text
+            }
+        )
 
-    content = content.replace("```json", "")
-    content = content.replace("```", "")
-    content = content.strip()
+        content = response.content.strip()
 
-    data = json.loads(content)
+        content = content.replace(
+            "```json",
+            ""
+        )
 
-    return JobDescription(**data)
+        content = content.replace(
+            "```",
+            ""
+        )
 
+        content = content.strip()
 
+        data = json.loads(content)
 
+        jd_data = JobDescription(
+            **data
+        )
 
+        # Validate extracted skills
 
+        if (
+            len(
+                jd_data.required_skills
+            ) == 0
+        ):
 
+            raise ValueError(
+                "No required skills found in Job Description"
+            )
 
+        return jd_data
 
+    except json.JSONDecodeError:
 
+        raise ValueError(
+            "LLM returned invalid JSON for JD analysis"
+        )
 
+    except Exception as e:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from langchain_core.prompts import ChatPromptTemplate
-
-# from services.llm import get_llm
-# from schemas.jd_schema import JobDescription
-
-
-# def analyze_jd(jd_text : str):
-
-#     llm = get_llm()
-
-#     structured_llm = llm.with_structured_output(JobDescription)
-#     prompt = ChatPromptTemplate.from_template(
-#         """
-#         You are an expert recruiter.
-
-#         Analyze the following job description.
-
-#         Extract:
-
-#         - Role
-#         - Required Skills
-#         - Preferred Skills
-#         - Experience Requirements
-
-#         Job Description:
-
-#         {jd_text}
-#         """
-#     )
-
-#     chain = prompt | structured_llm
-
-#     return chain.invoke({
-#         "jd_text": jd_text
-#     })
+        raise ValueError(
+            f"JD Analysis Failed: {str(e)}"
+        )
