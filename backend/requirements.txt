@@ -10,5 +10,4 @@ langgraph
 
 python-dotenv
 
-sentence-transformers
 scikit-learn

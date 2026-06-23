@@ -15,7 +15,7 @@ def critique_candidate(
 
     prompt = ChatPromptTemplate.from_template(
         """
-        You are a strict senior hiring manager.
+        You are a senior hiring manager.
 
         Job Description:
         {jd_data}
@@ -34,7 +34,7 @@ def critique_candidate(
         - risks
         - weaknesses
         - lack of production experience
-        - lack of cloud/devops knowledge
+        # - lack of cloud/devops knowledge
 
         Return ONLY valid JSON.
 
