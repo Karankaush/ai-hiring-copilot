@@ -8,6 +8,7 @@ from graph.nodes.evaluator import (evaluate_candidate)
 from graph.nodes.critic import critique_candidate
 from graph.nodes.judge import judge_candidate
 from graph.nodes.ranking import rank_candidates
+from utils.parallel import run_parallel
 
 
 
@@ -65,14 +66,50 @@ def skill_matcher_node(state: HiringState):
     }
 
 
+def critic_node(state: HiringState):
+
+    def critique_resume(data):
+
+        resume, evaluation = data
+
+        critique = critique_candidate(
+            state["jd_data"],
+            resume,
+            evaluation
+        )
+
+        return {
+            "candidate": resume["name"],
+            **critique
+        }
+
+    critique_data = list(
+        zip(
+            state["resumes"],
+            state["evaluations"]
+        )
+    )
+
+    critiques = run_parallel(
+        critique_resume,
+        critique_data
+    )
+
+    return {
+        "critiques": critiques
+    }
+
 
 def evaluator_node(state : HiringState):
-    evaluations = []
+    def evaluate_resume(data):
+        resume, match_result = data
 
-    for resume, match_result in zip(state["resumes"], state['matches']):
         evaluation = evaluate_candidate(state["jd_data"], resume, match_result)
 
-        final_score = round((match_result['match_score'] * 0.7) + (evaluation['score'] * 0.3), 2 )
+        final_score = round(
+            (match_result["match_score"] * 0.7) + (evaluation["score"] * 0.3), 2
+        )
+
         if final_score >= 85:
             recommendation = "Strong Hire"
 
@@ -84,35 +121,40 @@ def evaluator_node(state : HiringState):
 
         else:
             recommendation = "Reject"
-        evaluations.append(
-            {
-                "candidate": resume["name"],
 
-                "match_score":
-                match_result["match_score"],
+        return {
 
-                "evaluator_score":
-                evaluation["score"],
+            "candidate": resume["name"],
 
-                "final_score":
-                final_score,
-                "recommendation":
-                recommendation,
+            "match_score":
+            match_result["match_score"],
 
-                "strengths":
-                evaluation["strengths"],
+            "evaluator_score":
+            evaluation["score"],
 
-                "reasoning":
-                evaluation["reasoning"]
-            }
-        )
+            "final_score":
+            final_score,
 
-    return {
-        "evaluations": evaluations
+            "recommendation":
+            recommendation,
+
+            "strengths":
+            evaluation["strengths"],
+
+            "reasoning":
+            evaluation["reasoning"]
+        }
+
+    resume_data = list(zip(state["resumes"], state["matches"]))
+
+    evaluations = run_parallel(evaluate_resume, resume_data)
+    return{
+        "evaluations" : evaluations
     }
 
 
-def critic_node(state: HiringState):
+
+
 
     critiques = []
 
@@ -138,7 +180,6 @@ def critic_node(state: HiringState):
         "critiques": critiques
     }
 
-def judge_node(state: HiringState):
 
     judgments = []
 
@@ -165,6 +206,44 @@ def judge_node(state: HiringState):
     return {
         "judgments": judgments
     }
+
+
+def judge_node(state: HiringState):
+
+    def judge_resume(data):
+
+        resume, evaluation, critique = data
+
+        judgment = judge_candidate(
+            state["jd_data"],
+            resume,
+            evaluation,
+            critique
+        )
+
+        return {
+            "candidate": resume["name"],
+            **judgment
+        }
+
+    judgment_data = list(
+        zip(
+            state["resumes"],
+            state["evaluations"],
+            state["critiques"]
+        )
+    )
+
+    judgments = run_parallel(
+        judge_resume,
+        judgment_data
+    )
+
+    return {
+        "judgments": judgments
+    }
+
+
 
 def ranking_node(state: HiringState):
 
